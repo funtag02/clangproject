@@ -1,0 +1,3 @@
+F:/githubprojects hdd2to/clangproject/cmake-build-debug/CMakeFiles/clangproject.dir
+F:/githubprojects hdd2to/clangproject/cmake-build-debug/CMakeFiles/edit_cache.dir
+F:/githubprojects hdd2to/clangproject/cmake-build-debug/CMakeFiles/rebuild_cache.dir
