@@ -2,10 +2,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "clangproject.exe"
-		},
-		{
-			"path" : "clangproject.pdb"
+			"path" : "clangproject"
 		}
 	],
 	"backtrace" : 1,
@@ -38,7 +35,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "-g"
+					"fragment" : "-g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk"
 				},
 				{
 					"fragment" : "-std=gnu11"
@@ -71,16 +68,12 @@
 			{
 				"fragment" : "",
 				"role" : "flags"
-			},
-			{
-				"fragment" : "-lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32",
-				"role" : "libraries"
 			}
 		],
 		"language" : "C"
 	},
 	"name" : "clangproject",
-	"nameOnDisk" : "clangproject.exe",
+	"nameOnDisk" : "clangproject",
 	"paths" : 
 	{
 		"build" : ".",
