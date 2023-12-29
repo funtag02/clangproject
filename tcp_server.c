@@ -13,9 +13,9 @@ int main(int argc, char **argv){
 
     // internet socket, TCP (stream)
     if ((listenfd = socket(AF_INET, SOCK_STREAM, 0)) < 0){
-        fprintf(stderr, "erreur lors de la création de la socket !");
+        fprintf(stderr, "\nerreur lors de la création de la socket !\n");
     } else {
-        fprintf(stdout, "socket AF_INET, SOCK_STREAM crée");
+        fprintf(stdout, "\nsocket AF_INET, SOCK_STREAM crée\n");
     }
 
     // setup de l'adresse :
@@ -26,12 +26,12 @@ int main(int argc, char **argv){
 
     // bind de l'adresse à laquelle on écoute, à celle du serveur
     if ((bind(listenfd, (SA *) &servaddr, sizeof(servaddr))) < 0){
-        fprintf(stderr, "erreur de bind entre le client et le serveur");
+        fprintf(stderr, "erreur de bind entre le client et le serveur\n");
         exit(1);
     }
 
     if ((listen(listenfd, 10)) < 0){
-        fprintf(stderr, "erreur d'écoute du client, côté serveur");
+        fprintf(stderr, "erreur d'écoute du client, côté serveur\n");
         exit(1);
     }
 
@@ -44,7 +44,7 @@ int main(int argc, char **argv){
         // accepte des blocs jusqu'à ce qu'une nouvelle connexion arrive
         // retourne une description du fichier à la conneixon
 
-        fprintf(stdout, "en attente d'une connexion sur le port %d", SERVER_PORT);
+        fprintf(stdout, "en attente d'une connexion sur le port %d\n", SERVER_PORT);
         fflush(stdout);
         connfd = accept(listenfd, (SA *) &addr, &addr_len);
 
@@ -68,7 +68,7 @@ int main(int argc, char **argv){
         }
 
         if (n < 0){
-            fprintf(stderr, "erreur de lecture du message du client");
+            fprintf(stderr, "erreur de lecture du message du client\n");
             exit(1);
         }
 

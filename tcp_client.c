@@ -13,7 +13,7 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 
-#define SERVER_PORT 80
+#define SERVER_PORT 18074
 
 #define MAX_LINE 4096
 #define SA struct sockaddr
@@ -39,13 +39,16 @@ int main(int argc, char **argv){
     }
 
     // création de la socket de stream (TCP)
-    if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0){
+    if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1){
         // en gros, if == -1
-        fprintf(stderr, "erreur lors de la création de la socket !\n");
+        fprintf(stderr, "erreur lors de la création de la socket !, sockfd = %d\n", sockfd);
         exit(1);
     } else {
-        fprintf(stdout, "socket AF_INET, SOCK_STREAM crée avec succès !\n");
+        fflush(stdout);
+        fprintf(stdout, "socket AF_INET, SOCK_STREAM crée avec succès ! : sockfd = %d\n", sockfd);
     }
+
+    fprintf(stdout, "here\n");
 
     // initialise tous les octets du bloc de mémoire pointé par servaddr à 0
     bzero(&servaddr, sizeof(servaddr));
@@ -56,13 +59,13 @@ int main(int argc, char **argv){
     // convertir la représentation textuelle de l'IP du serveur en une représentation binaire équivalente
     // expl : "1.2.3.4" => [ 1 , 2 , 3 , 4 ]
     if (inet_pton(AF_INET, argv[1], &servaddr.sin_addr) <= 0){
-        fprintf(stderr, "erreur du inet_pton pour %s", argv[1]);
+        fprintf(stderr, "erreur du inet_pton pour %s\n", argv[1]);
         exit(1);
     }
 
     // tentative de connexion au serveur
     if (connect(sockfd, (SA *) &servaddr, sizeof(servaddr)) < 0){
-        fprintf(stderr, "la tentative de connexion a échouée !");
+        fprintf(stderr, "la tentative de connexion a échouée !\n");
         exit(1);
     }
 
@@ -76,7 +79,7 @@ int main(int argc, char **argv){
     // normalement, on va réessayer, sauf si la valeur de retour est -1 (erreur)
 
     if (write(sockfd, sendline, sendbytes) != sendbytes){
-        fprintf(stderr, "erreur d'écriture du message");
+        fprintf(stderr, "erreur d'écriture du message\n");
     }
 
     // ligne équivalente à celle bzero
@@ -85,11 +88,11 @@ int main(int argc, char **argv){
     // lecture de la réponse du serveur
     while ( (n = read(sockfd, recvline, MAX_LINE-1)) > 0){
         memset(recvline, 0, MAX_LINE);
-        printf("%s", recvline);
+        printf("\n%s\n", recvline);
     }
 
     if (n < 0){
-        fprintf(stderr, "erreur de lecture de la réponse du serveur");
+        fprintf(stderr, "erreur de lecture de la réponse du serveur\n");
     }
 
 
