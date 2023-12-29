@@ -7,7 +7,7 @@
 
 int main(int argc, char **argv){
     int                 listenfd, connfd, n;
-    struct sockadr_in   servaddr;
+    struct sockaddr_in  servaddr;
     uint8_t             buff[MAX_LINE+1];
     uint8_t             recvline[MAX_LINE+1];
 
