@@ -76,13 +76,27 @@ int main(int argc, char **argv){
 
         fprintf(stdout, "message : %s\n", recvline);
 
-        // envoi de la réponse
+        // formattage de la requête, et écriture dans le tampon
         snprintf( (char *)buff, sizeof(buff), "HTTP/1.0 200 OK\r\n\r\nHello");
 
         // NOTE : il faudrait checker manuellement les valeurs de write et close pour vérifier si y'a aucune erreur
         // Pour l'instant, je les ignore
 
-        write(connfd, (char *)buff, strlen((char *)buff));
+        // écriture du message dans la socket
+        switch (write(connfd, (char *)buff, strlen((char *)buff))) {
+            case 0:
+                fprintf(stdout, "message null");
+                break;
+            case -1:
+                fprintf(stderr, "erreur lors de l'envoi de la réponse au client");
+                exit(1);
+            default:
+                //fprintf(stdout, "message '%s' envoyé avec succès !\n", recvline);
+                fprintf(stdout, "message envoyé au client avec succès !\n");
+                break;
+        }
+
+        // fermeture de la socket
         close(connfd);
 
     }

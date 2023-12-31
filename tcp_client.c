@@ -91,9 +91,15 @@ int main(int argc, char **argv){
         printf("\n%s\n", recvline);
     }
 
+    // affichage de la réponse en entier
+    fprintf(stdout, "_réponse : %s_\n", recvline);
+
     if (n < 0){
         fprintf(stderr, "erreur de lecture de la réponse du serveur\n");
     }
+
+    fprintf(stdout, "fin du programme !");
+    fflush(stdout);
 
 
     exit(0); // fin, avec succès !
