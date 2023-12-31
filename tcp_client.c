@@ -71,7 +71,7 @@ int main(int argc, char **argv){
 
     // connecté, donc on prépare le message à envoyer (ici, requête GET)
     // 2x slash r slash n pour indiquer que c'est la fin de ma requête
-    sprintf(sendline, "GET / HTTP/1.1\r\n\r\n");
+    sprintf(sendline, "skibilidopdopyesyes\n");
     sendbytes = strlen(sendline);
 
     // envoi de la requête -- on s'assure qu'on envoit bien tout

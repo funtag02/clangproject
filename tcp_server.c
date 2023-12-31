@@ -72,6 +72,10 @@ int main(int argc, char **argv){
             exit(1);
         }
 
+        // print du message du client
+
+        fprintf(stdout, "message : %s\n", recvline);
+
         // envoi de la réponse
         snprintf( (char *)buff, sizeof(buff), "HTTP/1.0 200 OK\r\n\r\nHello");
 
