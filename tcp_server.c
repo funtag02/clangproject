@@ -6,10 +6,12 @@
 #include <strings.h>
 
 int main(int argc, char **argv){
-    int                 clientfd, connfd, n;
+    int                 clientfd, connfd, n; // connexion file descriptor : socket info à propos du client
     struct sockaddr_in  servaddr;
     uint8_t             buff[MAX_LINE+1];
     uint8_t             recvline[MAX_LINE+1];
+
+    int                 nb_connexions = 1;
 
     // internet socket, TCP (stream)
     if ((clientfd = socket(AF_INET, SOCK_STREAM, 0)) < 0){
@@ -30,6 +32,7 @@ int main(int argc, char **argv){
         exit(1);
     }
 
+    // écoute pour la réponse du client (pour la connexion, pas la transmission)
     if ((listen(clientfd, 10)) < 0){
         fprintf(stderr, "erreur d'écoute du client, côté serveur\n");
         exit(1);
@@ -72,15 +75,37 @@ int main(int argc, char **argv){
             exit(1);
         }
 
-        // envoi de la réponse
-        snprintf( (char *)buff, sizeof(buff), "HTTP/1.0 200 OK\r\n\r\nHello");
+        // print du message du client
+
+        fprintf(stdout, "message : %s\n", recvline);
+
+        // formattage de la requête, et écriture dans le tampon
+        snprintf( (char *)buff, sizeof(buff), "HTTP/1.0 200 OK\r\n\r\nHelloZeubi");
+        //snprintf( (char *)buff, sizeof(buff), "HelloZeubi");
 
         // NOTE : il faudrait checker manuellement les valeurs de write et close pour vérifier si y'a aucune erreur
         // Pour l'instant, je les ignore
 
-        write(connfd, (char *)buff, strlen((char *)buff));
-        close(connfd);
+        // écriture du message dans la socket
+        switch (write(connfd, (char *)buff, strlen((char *)buff))) {
+            case 0:
+                fprintf(stdout, "message null");
+                break;
+            case -1:
+                fprintf(stderr, "erreur lors de l'envoi de la réponse au client");
+                exit(1);
+            default:
+                //fprintf(stdout, "message '%s' envoyé avec succès !\n", recvline);
+                fprintf(stdout, "message envoyé au client avec succès ! : \n______________\n%s\n______________\n", buff);
+                break;
+        }
 
+        // fermeture de la socket
+        close(connfd);
+        fprintf(stdout, "closing socket %d on port %d\n", nb_connexions, SERVER_PORT);
+        nb_connexions++;
     }
+
+    return 0;
 
 }
