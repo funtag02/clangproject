@@ -21,11 +21,16 @@
 #include <fcntl.h>
 #include <signal.h>
 
+// que pour linux : #include <sys/sendfile.h>
+// fichier qui me permettait d'utiliser sendfile pour envoyer le html sur la socket
+
 // constantes utiles
 #define SERVER_PORT 18074
 
 #define MAX_LINE 4096
 #define SA struct sockaddr
+#define FILENAME "2012-03-12-Drone-Parrot.jpg"
+#define SERVER_IP "192.168.1.36"
 
 // char *bin2hex
 // (méthode pour convertir un binaire en hexadécimal, puis l'afficher)

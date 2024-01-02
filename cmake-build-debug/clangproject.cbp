@@ -78,6 +78,9 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/Users/theo/Desktop/clangproject/dash_wrapper.cpp">
+			<Option target="clangproject"/>
+		</Unit>
 		<Unit filename="/Users/theo/Desktop/clangproject/main.c">
 			<Option target="clangproject"/>
 		</Unit>

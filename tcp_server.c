@@ -39,27 +39,44 @@ int main(int argc, char **argv){
     for ( ; ; ){
         struct sockaddr_in  addr;
         socklen_t           addr_len;
-        char                client_adress[MAX_LINE+1];
 
         // accepte des blocs jusqu'à ce qu'une nouvelle connexion arrive
         // retourne une description du fichier à la conneixon
 
         fprintf(stdout, "en attente d'une connexion sur le port %d\n", SERVER_PORT);
         fflush(stdout);
-        connfd = accept(clientfd, (SA *) &addr, &addr_len);
 
-        // network format => presentation format
+        // accepter la conexion du client
+        if ((connfd = accept(clientfd, (SA *) &addr, &addr_len)) == -1){
+            perror("error when accepting the client");
+            exit(1);
+        }
+
+        /*
+        // network format (binaire) => presentation format ("192.168.4.6")
+        // binaire = 1111_1111 x4 séparé par des '.'
         inet_ntop(AF_INET, &addr, client_adress, MAX_LINE);
         fprintf(stdout, "Connexion du client : %s\n", client_adress);
+
+        if (recv(clientfd, buff, sizeof(buff), 0) == -1){
+            perror("erreur de réception du message (requête) du client");
+            exit(1);
+        }
+        */
+
+        // envoi du fichier : format de requête client "GET /file.html...."
+
 
         // zero out le buffer de réception pour bien s'assurer qu'il se finisse par un null
         memset(recvline, 0, MAX_LINE);
 
+
         // lire le message du client
         while( (n = read(connfd, recvline, MAX_LINE-1) ) > 0){
             // fprintf(stdout, "\n%s\n\n%s", bin2hex(recvline, n), recvline);
+            fprintf(stdout, "\n\n%s", recvline);
 
-            // workaround pour trouver la fin du message
+            // workaround pour trouver la fin du message (faut verifier /r/n/r/n terminated)
             if (recvline[n-1] == '\n'){
                 break;
             }
@@ -72,14 +89,21 @@ int main(int argc, char **argv){
             exit(1);
         }
 
-        // envoi de la réponse
-        snprintf( (char *)buff, sizeof(buff), "HTTP/1.0 200 OK\r\n\r\nHello");
+        // envoi d'une réponse dans le buffer, vers le client
+        snprintf((char*)buff, sizeof(buff), "HTTP/1.0 200 OK \r\n\r\n message yessir");
 
-        // NOTE : il faudrait checker manuellement les valeurs de write et close pour vérifier si y'a aucune erreur
-        // Pour l'instant, je les ignore
+        if (write(connfd, (char*)buff, strlen((char*)buff)) == -1){
+            fprintf(stderr, "error writing to the buffer");
+            exit(1);
+        }
 
-        write(connfd, (char *)buff, strlen((char *)buff));
-        close(connfd);
+        // fermetue de la socket
+        if (close(connfd) == -1){
+            fprintf(stderr, "error closing the socket");
+            exit(1);
+        }
+
+        fflush(stdout);
 
     }
 
