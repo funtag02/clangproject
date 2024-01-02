@@ -6,13 +6,13 @@
 #include <strings.h>
 
 int main(int argc, char **argv){
-    int                 listenfd, connfd, n;
+    int                 clientfd, connfd, n;
     struct sockaddr_in  servaddr;
     uint8_t             buff[MAX_LINE+1];
     uint8_t             recvline[MAX_LINE+1];
 
     // internet socket, TCP (stream)
-    if ((listenfd = socket(AF_INET, SOCK_STREAM, 0)) < 0){
+    if ((clientfd = socket(AF_INET, SOCK_STREAM, 0)) < 0){
         fprintf(stderr, "\nerreur lors de la création de la socket !\n");
     } else {
         fprintf(stdout, "\nsocket AF_INET, SOCK_STREAM crée\n");
@@ -25,12 +25,12 @@ int main(int argc, char **argv){
     servaddr.sin_port =         htons(SERVER_PORT); // le port du serveur est défini dans le fichier common.h
 
     // bind de l'adresse à laquelle on écoute, à celle du serveur
-    if ((bind(listenfd, (SA *) &servaddr, sizeof(servaddr))) < 0){
+    if ((bind(clientfd, (SA *) &servaddr, sizeof(servaddr))) < 0){
         fprintf(stderr, "erreur de bind entre le client et le serveur\n");
         exit(1);
     }
 
-    if ((listen(listenfd, 10)) < 0){
+    if ((listen(clientfd, 10)) < 0){
         fprintf(stderr, "erreur d'écoute du client, côté serveur\n");
         exit(1);
     }
@@ -46,7 +46,7 @@ int main(int argc, char **argv){
 
         fprintf(stdout, "en attente d'une connexion sur le port %d\n", SERVER_PORT);
         fflush(stdout);
-        connfd = accept(listenfd, (SA *) &addr, &addr_len);
+        connfd = accept(clientfd, (SA *) &addr, &addr_len);
 
         // network format => presentation format
         inet_ntop(AF_INET, &addr, client_adress, MAX_LINE);
