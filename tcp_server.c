@@ -6,13 +6,15 @@
 #include <strings.h>
 
 int main(int argc, char **argv){
-    int                 listenfd, connfd, n;
+    int                 clientfd, connfd, n; // connexion file descriptor : socket info à propos du client
     struct sockaddr_in  servaddr;
     uint8_t             buff[MAX_LINE+1];
     uint8_t             recvline[MAX_LINE+1];
 
+    int                 nb_connexions = 1;
+
     // internet socket, TCP (stream)
-    if ((listenfd = socket(AF_INET, SOCK_STREAM, 0)) < 0){
+    if ((clientfd = socket(AF_INET, SOCK_STREAM, 0)) < 0){
         fprintf(stderr, "\nerreur lors de la création de la socket !\n");
     } else {
         fprintf(stdout, "\nsocket AF_INET, SOCK_STREAM crée\n");
@@ -25,12 +27,13 @@ int main(int argc, char **argv){
     servaddr.sin_port =         htons(SERVER_PORT); // le port du serveur est défini dans le fichier common.h
 
     // bind de l'adresse à laquelle on écoute, à celle du serveur
-    if ((bind(listenfd, (SA *) &servaddr, sizeof(servaddr))) < 0){
+    if ((bind(clientfd, (SA *) &servaddr, sizeof(servaddr))) < 0){
         fprintf(stderr, "erreur de bind entre le client et le serveur\n");
         exit(1);
     }
 
-    if ((listen(listenfd, 10)) < 0){
+    // écoute pour la réponse du client (pour la connexion, pas la transmission)
+    if ((listen(clientfd, 10)) < 0){
         fprintf(stderr, "erreur d'écoute du client, côté serveur\n");
         exit(1);
     }
@@ -46,7 +49,7 @@ int main(int argc, char **argv){
 
         fprintf(stdout, "en attente d'une connexion sur le port %d\n", SERVER_PORT);
         fflush(stdout);
-        connfd = accept(listenfd, (SA *) &addr, &addr_len);
+        connfd = accept(clientfd, (SA *) &addr, &addr_len);
 
         // network format => presentation format
         inet_ntop(AF_INET, &addr, client_adress, MAX_LINE);
@@ -77,7 +80,8 @@ int main(int argc, char **argv){
         fprintf(stdout, "message : %s\n", recvline);
 
         // formattage de la requête, et écriture dans le tampon
-        snprintf( (char *)buff, sizeof(buff), "HTTP/1.0 200 OK\r\n\r\nHello");
+        //snprintf( (char *)buff, sizeof(buff), "HTTP/1.0 200 OK\r\n\r\nHelloZeubi");
+        snprintf( (char *)buff, sizeof(buff), "HelloZeubi");
 
         // NOTE : il faudrait checker manuellement les valeurs de write et close pour vérifier si y'a aucune erreur
         // Pour l'instant, je les ignore
@@ -92,13 +96,16 @@ int main(int argc, char **argv){
                 exit(1);
             default:
                 //fprintf(stdout, "message '%s' envoyé avec succès !\n", recvline);
-                fprintf(stdout, "message envoyé au client avec succès !\n");
+                fprintf(stdout, "message envoyé au client avec succès ! : \n______________\n%s\n______________\n", buff);
                 break;
         }
 
         // fermeture de la socket
         close(connfd);
-
+        fprintf(stdout, "closing socket %d on port %d\n", nb_connexions, SERVER_PORT);
+        nb_connexions++;
     }
+
+    return 0;
 
 }

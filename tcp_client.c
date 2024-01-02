@@ -88,7 +88,7 @@ int main(int argc, char **argv){
     // lecture de la réponse du serveur
     while ( (n = read(sockfd, recvline, MAX_LINE-1)) > 0){
         memset(recvline, 0, MAX_LINE);
-        printf("\n%s\n", recvline);
+        printf("\nline = _'%s'_\n", recvline);
     }
 
     // affichage de la réponse en entier
