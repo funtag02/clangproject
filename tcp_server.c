@@ -80,8 +80,8 @@ int main(int argc, char **argv){
         fprintf(stdout, "message : %s\n", recvline);
 
         // formattage de la requête, et écriture dans le tampon
-        //snprintf( (char *)buff, sizeof(buff), "HTTP/1.0 200 OK\r\n\r\nHelloZeubi");
-        snprintf( (char *)buff, sizeof(buff), "HelloZeubi");
+        snprintf( (char *)buff, sizeof(buff), "HTTP/1.0 200 OK\r\n\r\nHelloZeubi");
+        //snprintf( (char *)buff, sizeof(buff), "HelloZeubi");
 
         // NOTE : il faudrait checker manuellement les valeurs de write et close pour vérifier si y'a aucune erreur
         // Pour l'instant, je les ignore
