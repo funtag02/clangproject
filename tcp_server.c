@@ -43,6 +43,8 @@ int main(int argc, char **argv){
         struct sockaddr_in  addr;
         socklen_t           addr_len;
         char                client_adress[MAX_LINE+1];
+        char                *filename = "2012-03-12-Drone-Parrot.jpg";
+
 
         // accepte des blocs jusqu'à ce qu'une nouvelle connexion arrive
         // retourne une description du fichier à la conneixon
@@ -87,6 +89,7 @@ int main(int argc, char **argv){
         // Pour l'instant, je les ignore
 
         // écriture du message dans la socket
+        /*
         switch (write(connfd, (char *)buff, strlen((char *)buff))) {
             case 0:
                 fprintf(stdout, "message null");
@@ -99,10 +102,13 @@ int main(int argc, char **argv){
                 fprintf(stdout, "message envoyé au client avec succès ! : \n______________\n%s\n______________\n", buff);
                 break;
         }
+         */
 
         // fermeture de la socket
-        close(connfd);
         fprintf(stdout, "closing socket %d on port %d\n", nb_connexions, SERVER_PORT);
+        if (close(connfd) == -1){
+            perror("close connfd");
+        }
         nb_connexions++;
     }
 
