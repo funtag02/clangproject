@@ -27,6 +27,9 @@
 #define MAX_LINE 4096
 #define SA struct sockaddr
 
+void sendFileToSocket(FILE *file, int socket);
+void serveImage(FILE *file, int clientSocket);
+
 // char *bin2hex
 // (méthode pour convertir un binaire en hexadécimal, puis l'afficher)
 

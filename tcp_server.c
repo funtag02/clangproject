@@ -8,10 +8,8 @@
 int main(int argc, char **argv){
     int                 clientfd, connfd, n; // connexion file descriptor : socket info à propos du client
     struct sockaddr_in  servaddr;
-    uint8_t             buff[MAX_LINE+1];
     uint8_t             recvline[MAX_LINE+1];
-
-    int                 nb_connexions = 1;
+    int                 nb_connexions = 0;
 
     // internet socket, TCP (stream)
     if ((clientfd = socket(AF_INET, SOCK_STREAM, 0)) < 0){
@@ -43,8 +41,15 @@ int main(int argc, char **argv){
         struct sockaddr_in  addr;
         socklen_t           addr_len;
         char                client_adress[MAX_LINE+1];
-        char                *filename = "2012-03-12-Drone-Parrot.jpg";
 
+        char                *filename = "2012-03-12-Drone-Parrot.jpg";
+        FILE                *fileptr = fopen(filename, "rb"); // readmode, binary
+
+        if (fileptr == NULL){
+            perror("fopen");
+            printf("\nCouldn't open file %s\n", filename);
+            exit(1);
+        }
 
         // accepte des blocs jusqu'à ce qu'une nouvelle connexion arrive
         // retourne une description du fichier à la conneixon
@@ -56,6 +61,7 @@ int main(int argc, char **argv){
         // network format => presentation format
         inet_ntop(AF_INET, &addr, client_adress, MAX_LINE);
         fprintf(stdout, "Connexion du client : %s\n", client_adress);
+        nb_connexions++;
 
         // zero out le buffer de réception pour bien s'assurer qu'il se finisse par un null
         memset(recvline, 0, MAX_LINE);
@@ -78,40 +84,89 @@ int main(int argc, char **argv){
         }
 
         // print du message du client
-
         fprintf(stdout, "message : %s\n", recvline);
 
-        // formattage de la requête, et écriture dans le tampon
-        snprintf( (char *)buff, sizeof(buff), "HTTP/1.0 200 OK\r\n\r\nHelloZeubi");
-        //snprintf( (char *)buff, sizeof(buff), "HelloZeubi");
+        // envoi du fichier jpeg à la socket (direct)
+        //sendFileToSocket(fileptr, connfd);
 
-        // NOTE : il faudrait checker manuellement les valeurs de write et close pour vérifier si y'a aucune erreur
-        // Pour l'instant, je les ignore
-
-        // écriture du message dans la socket
-        /*
-        switch (write(connfd, (char *)buff, strlen((char *)buff))) {
-            case 0:
-                fprintf(stdout, "message null");
-                break;
-            case -1:
-                fprintf(stderr, "erreur lors de l'envoi de la réponse au client");
-                exit(1);
-            default:
-                //fprintf(stdout, "message '%s' envoyé avec succès !\n", recvline);
-                fprintf(stdout, "message envoyé au client avec succès ! : \n______________\n%s\n______________\n", buff);
-                break;
-        }
-         */
+        // version 2 envoi du fichier jpeg à la socket (via http)
+        serveImage(fileptr, connfd);
 
         // fermeture de la socket
         fprintf(stdout, "closing socket %d on port %d\n", nb_connexions, SERVER_PORT);
         if (close(connfd) == -1){
             perror("close connfd");
         }
-        nb_connexions++;
     }
 
     return 0;
 
 }
+
+// de chatgpt
+void serveImage(FILE *file, int clientSocket) {
+    if (file == NULL) {
+        perror("Erreur lors de l'ouverture du fichier");
+        exit(EXIT_FAILURE);
+    }
+
+    // Construire la réponse HTTP avec le type de contenu
+    char response[1024];
+    snprintf(response, sizeof(response),
+             "HTTP/1.1 200 OK\r\n"
+             "Content-Type: image/jpeg\r\n\r\n");
+
+    // Envoyer l'en-tête de la réponse au client
+    send(clientSocket, response, strlen(response), 0);
+
+    // Lire et envoyer le contenu du fichier
+    char buffer[1024];
+    size_t bytesRead;
+
+    while ((bytesRead = fread(buffer, 1, sizeof(buffer), file)) > 0) {
+        send(clientSocket, buffer, bytesRead, 0);
+    }
+
+    fclose(file);
+}
+
+/*
+ void sendFileToSocket(FILE *file, int socket) {
+    // Lire la taille totale du fichier
+    fseek(file, 0, SEEK_END);
+    long file_size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    // Allouer un tampon pour stocker le fichier entier
+    char *buffer = (char *)malloc(file_size);
+    if (buffer == NULL) {
+        perror("Erreur lors de l'allocation du tampon");
+        fclose(file);
+        exit(EXIT_FAILURE);
+    }
+
+    // Lire le fichier dans le tampon
+    size_t bytesRead = fread(buffer, 1, file_size, file);
+    if (bytesRead != file_size) {
+        perror("Erreur lors de la lecture du fichier");
+        free(buffer);
+        fclose(file);
+        exit(EXIT_FAILURE);
+    }
+
+    // Envoyer le contenu du fichier à la socket
+    ssize_t sentBytes = send(socket, buffer, file_size, 0);
+    if (sentBytes == -1) {
+        perror("Erreur lors de l'envoi des données sur la socket");
+        free(buffer);
+        fclose(file);
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Nombre d'octets envoyés : %zd\n", sentBytes);
+
+    // Libérer la mémoire et fermer le fichier
+    free(buffer);
+    fclose(file);
+}
+ */
