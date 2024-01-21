@@ -42,14 +42,26 @@ int main(int argc, char **argv){
         socklen_t           addr_len;
         char                client_adress[MAX_LINE+1];
 
-        char                *filename = "2012-03-12-Drone-Parrot.jpg";
-        FILE                *fileptr = fopen(filename, "rb"); // readmode, binary
+        char                *current_file = "";
+        char                *files_list[5] = {
+                                "dsstats_exo1(2_3)_noemie.jpg",
+                                "dsstats_exo1(3)_raph.jpg",
+                                "screen mysql cli.jpg",
+                                "logo uca.jpeg",
+                                "2012-03-12-Drone-Parrot.jpg"
+                            };
+        /*
+        FILE                *fileptr = fopen(current_file, "rb"); // readmode, binary
+
+        // définition du fichier à traîter dans la requête : à envoyer
+        current_file = files_list[nb_connexions];
 
         if (fileptr == NULL){
             perror("fopen");
-            printf("\nCouldn't open file %s\n", filename);
+            printf("\nCouldn't open file %s\n", current_file);
             exit(1);
         }
+         */
 
         // accepte des blocs jusqu'à ce qu'une nouvelle connexion arrive
         // retourne une description du fichier à la conneixon
@@ -90,7 +102,14 @@ int main(int argc, char **argv){
         //sendFileToSocket(fileptr, connfd);
 
         // version 2 envoi du fichier jpeg à la socket (via http)
-        serveImage(fileptr, connfd);
+        // serveImage(fileptr, connfd);
+
+        // taille de la loop à fixer (ou faire une while not null)
+        for (int j = 0; j < 5; j++){
+            fprintf(stdout, "\nFILE %d : %s\n", j, files_list[j]);
+            serveImage(fopen(files_list[j], "rb"), connfd);
+            sleep(2);
+        }
 
         // fermeture de la socket
         fprintf(stdout, "closing socket %d on port %d\n", nb_connexions, SERVER_PORT);
@@ -105,6 +124,10 @@ int main(int argc, char **argv){
 
 // de chatgpt
 void serveImage(FILE *file, int clientSocket) {
+
+    int filesize = sizeof(file);
+    // char *filebuff[filesize];
+
     if (file == NULL) {
         perror("Erreur lors de l'ouverture du fichier");
         exit(EXIT_FAILURE);
